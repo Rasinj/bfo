@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFO (Basic Formal Ontology) - Interactive Hierarchy</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .controls button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        #tree-container {
+            width: 100%;
+            height: 800px;
+            overflow: auto;
+            background: white;
+        }
+
+        .node circle {
+            cursor: pointer;
+            stroke: #333;
+            stroke-width: 2px;
+            transition: all 0.3s;
+        }
+
+        .node circle:hover {
+            stroke-width: 3px;
+            filter: brightness(1.1);
+        }
+
+        .node text {
+            font: 14px sans-serif;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .node.highlighted circle {
+            stroke: #ff6b6b;
+            stroke-width: 4px;
+            filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.6));
+        }
+
+        .link {
+            fill: none;
+            stroke: #999;
+            stroke-width: 2px;
+            stroke-opacity: 0.6;
+        }
+
+        .tooltip {
+            position: absolute;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            border-radius: 8px;
+            pointer-events: none;
+            font-size: 13px;
+            max-width: 350px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .tooltip p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .tooltip .examples {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-style: italic;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .footer {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 BFO (Basic Formal Ontology)</h1>
+            <p>Interactive Visualization of 35 Classes in the Basic Formal Ontology</p>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number">35</span>
+                    <span class="stat-label">Classes</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">51</span>
+                    <span class="stat-label">FOL Axioms</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">✓</span>
+                    <span class="stat-label">Z3 Validated</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div>
+                <button onclick="expandAll()">Expand All</button>
+                <button onclick="collapseAll()">Collapse All</button>
+                <button onclick="resetZoom()">Reset View</button>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4299e1;"></div>
+                    <span>Continuant</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f6ad55;"></div>
+                    <span>Occurrent</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #48bb78;"></div>
+                    <span>Material</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9f7aea;"></div>
+                    <span>Quality/Realizable</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ed64a6;"></div>
+                    <span>Process</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="tree-container"></div>
+
+        <div class="footer">
+            <p>
+                BFO Axiom Validation Project |
+                <a href="https://github.com/Rasinj/bfo" target="_blank">View on GitHub</a> |
+                Click nodes to expand/collapse • Hover for details • Drag to pan • Scroll to zoom
+            </p>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Color scheme based on BFO entity types
+        const colorScheme = {
+            'root': '#667eea',
+            'continuant': '#4299e1',
+            'occurrent': '#f6ad55',
+            'material': '#48bb78',
+            'immaterial': '#a0aec0',
+            'region': '#cbd5e0',
+            'quality': '#9f7aea',
+            'realizable': '#b794f4',
+            'process': '#ed64a6'
+        };
+
+        // Dimensions
+        const width = 1400;
+        const height = 2000;
+        const margin = { top: 20, right: 120, bottom: 20, left: 120 };
+
+        // Create SVG
+        const svg = d3.select("#tree-container")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        const g = svg.append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        // Zoom behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 3])
+            .on("zoom", (event) => {
+                g.attr("transform", event.transform);
+            });
+
+        svg.call(zoom);
+
+        // Tree layout
+        const tree = d3.tree()
+            .size([height - margin.top - margin.bottom, width - margin.left - margin.right])
+            .separation((a, b) => a.parent === b.parent ? 1 : 1.2);
+
+        let root;
+        let i = 0;
+
+        // Tooltip
+        const tooltip = d3.select("#tooltip");
+
+        // Load and render data
+        d3.json("bfo-hierarchy.json").then(data => {
+            root = d3.hierarchy(data);
+            root.x0 = height / 2;
+            root.y0 = 0;
+
+            // Collapse all children initially except first level
+            root.children.forEach(collapse);
+
+            update(root);
+        });
+
+        function collapse(d) {
+            if (d.children) {
+                d._children = d.children;
+                d._children.forEach(collapse);
+                d.children = null;
+            }
+        }
+
+        function expand(d) {
+            if (d._children) {
+                d.children = d._children;
+                d._children = null;
+            }
+            if (d.children) {
+                d.children.forEach(expand);
+            }
+        }
+
+        function update(source) {
+            const duration = 750;
+            const treeData = tree(root);
+            const nodes = treeData.descendants();
+            const links = treeData.links();
+
+            // Normalize for fixed-depth
+            nodes.forEach(d => d.y = d.depth * 280);
+
+            // Update nodes
+            const node = g.selectAll(".node")
+                .data(nodes, d => d.id || (d.id = ++i));
+
+            // Enter new nodes
+            const nodeEnter = node.enter().append("g")
+                .attr("class", "node")
+                .attr("transform", d => `translate(${source.y0},${source.x0})`)
+                .on("click", click)
+                .on("mouseover", showTooltip)
+                .on("mouseout", hideTooltip);
+
+            nodeEnter.append("circle")
+                .attr("r", 1e-6)
+                .style("fill", d => d._children ? colorScheme[d.data.type] : "#fff")
+                .style("stroke", d => colorScheme[d.data.type]);
+
+            nodeEnter.append("text")
+                .attr("dy", ".35em")
+                .attr("x", d => d.children || d._children ? -15 : 15)
+                .attr("text-anchor", d => d.children || d._children ? "end" : "start")
+                .text(d => d.data.label)
+                .style("fill-opacity", 1e-6)
+                .style("font-weight", d => d.depth === 0 ? "bold" : "normal")
+                .style("font-size", d => d.depth === 0 ? "16px" : "14px");
+
+            // Transition nodes to new position
+            const nodeUpdate = nodeEnter.merge(node);
+
+            nodeUpdate.transition()
+                .duration(duration)
+                .attr("transform", d => `translate(${d.y},${d.x})`);
+
+            nodeUpdate.select("circle")
+                .attr("r", 8)
+                .style("fill", d => d._children ? colorScheme[d.data.type] : "#fff")
+                .style("stroke", d => colorScheme[d.data.type]);
+
+            nodeUpdate.select("text")
+                .style("fill-opacity", 1);
+
+            // Remove exiting nodes
+            const nodeExit = node.exit().transition()
+                .duration(duration)
+                .attr("transform", d => `translate(${source.y},${source.x})`)
+                .remove();
+
+            nodeExit.select("circle")
+                .attr("r", 1e-6);
+
+            nodeExit.select("text")
+                .style("fill-opacity", 1e-6);
+
+            // Update links
+            const link = g.selectAll(".link")
+                .data(links, d => d.target.id);
+
+            const linkEnter = link.enter().insert("path", "g")
+                .attr("class", "link")
+                .attr("d", d => {
+                    const o = { x: source.x0, y: source.y0 };
+                    return diagonal(o, o);
+                });
+
+            const linkUpdate = linkEnter.merge(link);
+
+            linkUpdate.transition()
+                .duration(duration)
+                .attr("d", d => diagonal(d.source, d.target));
+
+            link.exit().transition()
+                .duration(duration)
+                .attr("d", d => {
+                    const o = { x: source.x, y: source.y };
+                    return diagonal(o, o);
+                })
+                .remove();
+
+            // Store old positions
+            nodes.forEach(d => {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+        }
+
+        function diagonal(s, d) {
+            return `M ${s.y} ${s.x}
+                    C ${(s.y + d.y) / 2} ${s.x},
+                      ${(s.y + d.y) / 2} ${d.x},
+                      ${d.y} ${d.x}`;
+        }
+
+        function click(event, d) {
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            update(d);
+        }
+
+        function showTooltip(event, d) {
+            const data = d.data;
+            let html = `<h3>${data.label}</h3>`;
+            html += `<p><strong>Type:</strong> ${data.type}</p>`;
+            if (data.description) {
+                html += `<p><strong>Description:</strong> ${data.description}</p>`;
+            }
+            if (data.examples && data.examples.length > 0) {
+                html += `<div class="examples"><strong>Examples:</strong> ${data.examples.join(', ')}</div>`;
+            }
+
+            tooltip.html(html)
+                .classed("visible", true)
+                .style("left", (event.pageX + 15) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        }
+
+        function hideTooltip() {
+            tooltip.classed("visible", false);
+        }
+
+        function expandAll() {
+            root.children.forEach(expand);
+            update(root);
+        }
+
+        function collapseAll() {
+            root.children.forEach(collapse);
+            update(root);
+        }
+
+        function resetZoom() {
+            svg.transition().duration(750).call(
+                zoom.transform,
+                d3.zoomIdentity.translate(margin.left, margin.top)
+            );
+        }
+    </script>
+</body>
+</html>
