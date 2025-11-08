@@ -5,6 +5,7 @@ Generates a tree structure suitable for D3.js
 """
 
 import json
+import os
 import re
 
 def parse_bfo_classes(json_file):
@@ -341,7 +342,15 @@ if __name__ == "__main__":
     hierarchy = build_hierarchy()
 
     # Save to JSON file for D3.js
-    output_file = "/home/user/bfo/docs/bfo-hierarchy.json"
+    # Get the project root directory (parent of bfo-project)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    docs_dir = os.path.join(project_root, "docs")
+
+    # Create docs directory if it doesn't exist
+    os.makedirs(docs_dir, exist_ok=True)
+
+    output_file = os.path.join(docs_dir, "bfo-hierarchy.json")
     with open(output_file, 'w') as f:
         json.dump(hierarchy, f, indent=2)
 
