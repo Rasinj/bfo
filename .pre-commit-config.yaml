@@ -1,0 +1,46 @@
+# Pre-commit configuration for BFO project
+# Install with: pip install pre-commit
+# Setup with: pre-commit install
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=10000']
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+
+  - repo: local
+    hooks:
+      - id: bfo-z3-validation
+        name: Run BFO Z3 Validation
+        entry: bash -c 'cd bfo-project && python bfo_z3_validation.py'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: bfo-demo-validation
+        name: Run BFO Demo Validation
+        entry: bash -c 'cd bfo-project && python bfo_validation_demo.py'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: verify-hierarchy-json
+        name: Verify hierarchy JSON is valid
+        entry: bash -c 'python -c "import json; json.load(open(\"docs/bfo-hierarchy.json\"))"'
+        language: system
+        pass_filenames: false
+        files: docs/bfo-hierarchy.json
+
+      - id: check-visualization-files
+        name: Check visualization files exist
+        entry: bash -c 'test -f docs/index.html && test -f docs/bfo-hierarchy.json && test -f docs/bfo-hierarchy-preview.png'
+        language: system
+        pass_filenames: false
+        always_run: true

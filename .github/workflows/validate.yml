@@ -1,0 +1,77 @@
+name: BFO Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Run BFO Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install z3-solver matplotlib
+
+      - name: Run Z3 validation
+        run: |
+          cd bfo-project
+          python bfo_z3_validation.py
+        continue-on-error: false
+
+      - name: Run demo validation
+        run: |
+          cd bfo-project
+          python bfo_validation_demo.py
+        continue-on-error: false
+
+      - name: Extract BFO hierarchy
+        run: |
+          python bfo-project/extract_hierarchy.py
+
+      - name: Generate preview image
+        run: |
+          python bfo-project/create_preview_image.py
+
+      - name: Verify hierarchy JSON
+        run: |
+          python -c "import json; json.load(open('docs/bfo-hierarchy.json'))"
+
+      - name: Verify visualization files exist
+        run: |
+          test -f docs/index.html
+          test -f docs/bfo-hierarchy.json
+          test -f docs/bfo-hierarchy-preview.png
+
+      - name: Upload validation artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validation-results
+          path: |
+            docs/
+            bfo-project/*.md
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "### Validation Complete ✓" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Z3 validation passed" >> $GITHUB_STEP_SUMMARY
+          echo "- Demo validation passed" >> $GITHUB_STEP_SUMMARY
+          echo "- Hierarchy extraction successful" >> $GITHUB_STEP_SUMMARY
+          echo "- Visualization files generated" >> $GITHUB_STEP_SUMMARY

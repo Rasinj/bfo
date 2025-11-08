@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch, Circle, FancyArrowPatch
 import json
+import os
 
 # Set up the figure
 fig, ax = plt.subplots(1, 1, figsize=(16, 12))
@@ -182,9 +183,19 @@ ax.text(8, 0.5, 'Interactive version: Click to expand/collapse • Hover for det
         ha='center', va='center', fontsize=10, style='italic', color='#666',
         bbox=dict(boxstyle='round,pad=0.5', facecolor='#f0f0f0', edgecolor='#999'))
 
+# Get the project root directory (parent of bfo-project)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+docs_dir = os.path.join(project_root, "docs")
+
+# Create docs directory if it doesn't exist
+os.makedirs(docs_dir, exist_ok=True)
+
+output_file = os.path.join(docs_dir, "bfo-hierarchy-preview.png")
+
 plt.tight_layout()
-plt.savefig('/home/user/bfo/docs/bfo-hierarchy-preview.png', dpi=200, bbox_inches='tight',
+plt.savefig(output_file, dpi=200, bbox_inches='tight',
             facecolor='white', edgecolor='none')
-print("✓ Preview image saved to /home/user/bfo/docs/bfo-hierarchy-preview.png")
+print(f"✓ Preview image saved to {output_file}")
 
 plt.close()
