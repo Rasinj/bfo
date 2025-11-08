@@ -6,7 +6,7 @@ A comprehensive project for formal validation of **Basic Formal Ontology (BFO)**
 [![BFO Classes](https://img.shields.io/badge/BFO_Classes-35-blue)](docs/index.html)
 [![FOL Axioms](https://img.shields.io/badge/FOL_Axioms-51-orange)](bfo-project/fol_axioms.json)
 
-## 🎯 What is BFO?
+## What is BFO?
 
 **Basic Formal Ontology (BFO)** is a top-level ontology designed to support information integration and semantic interoperability across scientific disciplines. It provides a formal framework for categorizing all entities in reality into two fundamental types:
 
@@ -15,11 +15,11 @@ A comprehensive project for formal validation of **Basic Formal Ontology (BFO)**
 
 BFO is widely used in biomedical informatics, scientific databases, and AI reasoning systems.
 
-## 🌳 Interactive Visualization
+## Interactive Visualization
 
 Explore all 35 BFO classes in an interactive hierarchical tree:
 
-**[🚀 Launch Interactive Visualization](https://rasinj.github.io/bfo/)** *(Click to expand/collapse • Hover for details)*
+**[Launch Interactive Visualization](https://rasinj.github.io/bfo/)** *(Click to expand/collapse • Hover for details)*
 
 [![BFO Hierarchy Visualization](docs/bfo-hierarchy-preview.png)](https://rasinj.github.io/bfo/)
 
@@ -27,14 +27,14 @@ Explore all 35 BFO classes in an interactive hierarchical tree:
 
 ### Visualization Features
 
-- ✨ **Interactive**: Click nodes to expand/collapse branches
-- 📊 **Color-coded**: Different entity types have distinct colors
-- 🔍 **Detailed tooltips**: Hover over nodes for definitions and examples
-- 🎯 **35 Classes**: Complete BFO hierarchy from Entity to leaf concepts
-- 🖱️ **Pan & Zoom**: Drag to pan, scroll to zoom
-- 📱 **Responsive**: Works on desktop and mobile devices
+- **Interactive**: Click nodes to expand/collapse branches
+- **Color-coded**: Different entity types have distinct colors
+- **Detailed tooltips**: Hover over nodes for definitions and examples
+- **35 Classes**: Complete BFO hierarchy from Entity to leaf concepts
+- **Pan & Zoom**: Drag to pan, scroll to zoom
+- **Responsive**: Works on desktop and mobile devices
 
-## 📚 Project Overview
+## Project Overview
 
 ### Key Components
 
@@ -71,58 +71,63 @@ Entity (root)
     └── Spatiotemporal Region
 ```
 
-## ✅ Formal Validation Results
+## Formal Validation
 
-This project uses the **Z3 SMT Solver** to formally verify BFO's logical consistency.
+This project uses the **Z3 SMT Solver** to formally verify BFO's logical consistency. All 51 First-Order Logic axioms have been proven consistent through automated theorem proving.
 
-### What We Validated
+### Validation Coverage
 
-| Validation Test | Result | Details |
+| Validation Test | Status | Details |
 |----------------|---------|---------|
-| **Axiom Consistency** | ✅ PASS | All 51 FOL axioms are logically consistent |
-| **Type Hierarchies** | ✅ PASS | Process → Occurrent → Entity |
-| **Disjointness Constraints** | ✅ PASS | Continuant ⊥ Occurrent (mutually exclusive) |
-| **Expected Entailments** | ✅ PASS | All processes are occurrents ✓ |
-| **Mereological Properties** | ✅ PASS | Part-whole relations maintain type consistency |
+| **Axiom Consistency** | PASS | All 51 FOL axioms are logically consistent |
+| **Type Hierarchies** | PASS | Process → Occurrent → Entity |
+| **Disjointness Constraints** | PASS | Continuant ⊥ Occurrent (mutually exclusive) |
+| **Expected Entailments** | PASS | All processes are occurrents |
+| **Mereological Properties** | PASS | Part-whole relations maintain type consistency |
 
-### Key Findings
+The validation demonstrates that BFO's core axioms are logically sound, with no contradictions found in the tested axiom set. Type hierarchies work as specified, fundamental categories are properly separated, and all definitions are well-formed.
 
-1. **BFO Core is Logically Consistent**: No contradictions found in tested axioms
-2. **Expected Entailments Hold**: Type hierarchies work as intended
-3. **Disjointness Constraints Work**: Fundamental categories properly separated
-4. **Definitions are Well-Formed**: Biconditional definitions like Process work correctly
-5. **Mereological Properties Preserved**: Part-whole relations maintain types
+See [z3_validation_summary.md](bfo-project/z3_validation_summary.md) for detailed validation results.
 
-See [z3_validation_summary.md](bfo-project/z3_validation_summary.md) for complete validation results.
+## Quick Start
 
-## 🚀 Quick Start
-
-### Run Z3 Validation
+### For Users
 
 ```bash
 cd bfo-project
 
-# Install Z3 (if not already installed)
+# Install dependencies
 pip install z3-solver
 
-# Run real Z3 validation
+# Run Z3 validation
 python bfo_z3_validation.py
 
 # Or run demo version (no dependencies)
 python bfo_validation_demo.py
 ```
 
+### For Developers
+
+```bash
+# One-time setup (installs dependencies and pre-commit hooks)
+./setup-dev.sh
+
+# Pre-commit hooks will automatically run validation before each commit
+# To manually run all checks:
+pre-commit run --all-files
+```
+
 ### Explore the Data
 
 ```bash
 # View all 35 BFO classes with definitions and examples
-cat classes-annotations-human-readable.json
+cat bfo-project/classes-annotations-human-readable.json
 
 # View the 51 First-Order Logic axioms
-cat fol_axioms.json
+cat bfo-project/fol_axioms.json
 
 # Convert OWL to JSON (if needed)
-python owl_to_json.py
+python bfo-project/owl_to_json.py
 ```
 
 ### View Visualization Locally
@@ -133,7 +138,7 @@ python -m http.server 8000
 # Open http://localhost:8000 in your browser
 ```
 
-## 📊 Project Statistics
+## Project Statistics
 
 - **35 BFO Classes**: Complete hierarchy from top-level Entity to leaf concepts
 - **51 FOL Axioms**: Extracted from BFO 2.0 CLIF specification
@@ -141,7 +146,7 @@ python -m http.server 8000
 - **Real Examples**: Each class includes real-world examples
 - **Interactive Visualization**: Explore the full hierarchy dynamically
 
-## 🔬 Technical Details
+## Technical Details
 
 ### Axiom Types Validated
 
@@ -154,19 +159,19 @@ python -m http.server 8000
 ### SMT Solver Validation
 
 The Z3 SMT solver provides:
-- ✅ **Formal mathematical proofs** (not heuristics)
-- ✅ **Model generation** for satisfiable axioms
-- ✅ **Counterexample detection** for invalid entailments
-- ✅ **Handling of quantified formulas** (∀, ∃)
+- **Formal mathematical proofs** (not heuristics)
+- **Model generation** for satisfiable axioms
+- **Counterexample detection** for invalid entailments
+- **Handling of quantified formulas** (∀, ∃)
 
-## 📖 Learn More About BFO
+## Learn More About BFO
 
 - **Official BFO Website**: [https://basic-formal-ontology.org/](https://basic-formal-ontology.org/)
 - **BFO 2.0 Reference**: Complete specification and documentation
 - **Applications**: Medical informatics, scientific databases, AI reasoning
 - **Use Cases**: Gene Ontology (GO), OBO Foundry ontologies
 
-## 🎨 Visualization Technology
+## Visualization Technology
 
 The interactive visualization uses:
 - **D3.js v7**: Hierarchical tree layout with smooth animations
@@ -175,7 +180,27 @@ The interactive visualization uses:
 - **Interactive Tooltips**: Detailed information on hover
 - **Pan & Zoom**: Full navigation support
 
-## 🤝 Contributing
+## Continuous Integration
+
+The project includes automated validation through:
+
+### GitHub Actions
+- Runs on every push and pull request
+- Validates all 51 FOL axioms using Z3
+- Generates visualization files
+- Ensures data integrity
+
+See [.github/workflows/validate.yml](.github/workflows/validate.yml) for details.
+
+### Pre-commit Hooks
+- Automatically validates BFO axioms before each commit
+- Checks JSON file integrity
+- Verifies visualization files exist
+- Prevents commits with validation failures
+
+Install with: `./setup-dev.sh` or `pre-commit install`
+
+## Contributing
 
 Contributions are welcome! Areas for contribution:
 - Additional validation tests
@@ -183,11 +208,16 @@ Contributions are welcome! Areas for contribution:
 - Documentation improvements
 - BFO application examples
 
-## 📄 License
+All contributions must pass:
+- Z3 validation tests
+- Pre-commit hooks
+- GitHub Actions CI checks
+
+## License
 
 This project is provided for research and educational purposes.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **BFO Development Team**: For creating and maintaining BFO
 - **Z3 Theorem Prover**: For powerful SMT solving capabilities

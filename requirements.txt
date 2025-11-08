@@ -1,0 +1,10 @@
+# BFO Project Dependencies
+
+# SMT Solver for formal validation
+z3-solver>=4.12.0
+
+# Visualization generation
+matplotlib>=3.7.0
+
+# Pre-commit hooks
+pre-commit>=3.5.0
