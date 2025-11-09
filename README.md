@@ -6,6 +6,16 @@ A comprehensive project for formal validation of **Basic Formal Ontology (BFO)**
 [![BFO Classes](https://img.shields.io/badge/BFO_Classes-35-blue)](docs/index.html)
 [![FOL Axioms](https://img.shields.io/badge/FOL_Axioms-51-orange)](bfo-project/fol_axioms.json)
 
+## Start Here
+
+Choose your path:
+
+**→ [Explore the Interactive Visualization](https://rasinj.github.io/bfo/)** - Best for understanding the BFO hierarchy visually
+
+**→ [Run the Validation](#quick-start)** - For developers wanting to verify BFO axioms with Z3
+
+**→ [Learn About BFO](#what-is-bfo)** - For newcomers to formal ontology
+
 ## What is BFO?
 
 **Basic Formal Ontology (BFO)** is a top-level ontology designed to support information integration and semantic interoperability across scientific disciplines. It provides a formal framework for categorizing all entities in reality into two fundamental types:
